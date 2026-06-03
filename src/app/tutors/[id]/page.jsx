@@ -128,6 +128,7 @@
 
 
 
+import EnrollmentButton from '@/components/EnrollmentButton';
 import { auth } from '@/lib/auth';
 import { Chip } from '@heroui/react';
 import { BookOpen, Clock, BarChart, Users } from 'lucide-react';
@@ -163,20 +164,22 @@ export default async function CourseDetails({ params }) {
 
     const tutors = await fetchSingleCourse(id, token);
     
-    // সেফগার্ড চেক
-    if (!tutors || Object.keys(tutors).length === 0) {
-        return <NotFound />;
-    }
+    console.log(tutors);
+    
+    // if (!tutors || Object.keys(tutors).length === 0) {
+    //     return <NotFound />;
+    // }
 
-    const { _id, title, description, thumbnail, category, price, duration, instructor } = tutors;
-
+    const { _id,  enrolledStudents, title, description, thumbnail, category, price, duration, instructor } = tutors;
+   
+    
     const featuredItems = [
         { icon: Clock, label: duration || '12h 30m' },
         { icon: BarChart, label: category || 'Beginner' },
         { icon: BookOpen, label: `24 Lessons` },
-        { icon: Users, label: `0 Students` },
-    ];
-
+        { icon: Users, label: `${ enrolledStudents || 0} Students` },
+        
+        ];
     return (
         // ব্যাকগ্রাউন্ড লাক্সারি ডিপ ডার্ক থিম করা হয়েছে
         <div className="min-h-screen bg-[#0f1115] text-white py-12">
@@ -266,6 +269,8 @@ export default async function CourseDetails({ params }) {
                                     ))}
                                 </ul>
                             </div>
+
+                            <EnrollmentButton tutors={tutors}></EnrollmentButton>
                             <p className="text-center text-xs text-gray-500 font-bold">30-Day Money-Back Guarantee • Secure Payment</p>
                         </div>
                     </div>
@@ -286,3 +291,5 @@ const NotFound = () => {
         </div>
     );
 };
+
+

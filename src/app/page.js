@@ -19,6 +19,7 @@ export default function Home() {
      
       <TextCard></TextCard>
       <ServiceCards></ServiceCards>
+      {/* <my-tutors></my-tutors> */}
        {/* <TextCard></TextCard> */}
 
     
