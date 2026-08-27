@@ -1,277 +1,239 @@
-// import { Chip } from '@heroui/react';
-// import { BookOpen, Clock, BarChart, Users } from 'lucide-react';
-// import Image from 'next/image';
-
-
-// const fetchSingleCourse = async (id) => {
-   
-//       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tutors/${id}`);
-//       const data = res.json();
-//       return data || {};
-// };
-
-// export default async function CourseDetails({params}) {
- 
-//       const { id } = await params;
-//       const tutors = await fetchSingleCourse(id);
-//       const { _id, title, description, thumbnail, category, price, duration, instructor } = tutors;
 
 
 
+import EnrollmentButton from "@/components/EnrollmentButton";
+import { auth } from "@/lib/auth";
+import { Chip } from "@heroui/react";
 
-     
-//     const featuredItems = [
-//         { icon: Clock, label: duration || '12h 30m' },
-//         { icon: BarChart, label: title || 'Beginner' },
-//         { icon: BookOpen, label: `24 Lessons` },
-//         { icon: Users, label: `0 Students` },
-//     ];
-//     return (
-//         <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
-//                 <div className="lg:col-span-2 space-y-8">
-//                     <div className="relative group overflow-hidden rounded-[2.5rem] shadow-2xl aspect-video">
-//                         <Image
-//                             src={thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600'}
-//                             alt={title}
-//                             fill
-//                             className="object-cover transform transition duration-700 group-hover:scale-105"
-//                         />
-//                         <div className="absolute top-6 left-6">
-//                             <Chip
-//                                 color="primary"
-//                                 variant="solid"
-//                                 className="font-bold shadow-xl"
-//                             >
-//                                 Premium
-//                             </Chip>
-//                         </div>
-//                     </div>
+import {
+    BookOpen,
+    Clock,
+    Users,
+    MapPin,
+    Building,
+    Briefcase,
+    Calendar,
+    GraduationCap,
+} from "lucide-react";
 
-//                     <div className="space-y-4">
-//                         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-//                             Mastering Next - From Beginner to Pro
-//                         </h1>
-//                         <p className="text-xl text-slate-500 leading-relaxed">
-//                             Master the core concepts of this subject with our comprehensive guide designed for all skill levels.
-//                         </p>
-//                     </div>
-
-//                     <div className="flex flex-wrap gap-4 pt-8 border-t border-border">
-//                         {featuredItems.map((item, i) => (
-//                             <div
-//                                 key={i}
-//                                 className="flex items-center gap-3 bg-slate-100 px-6 py-3 rounded-2xl border border-slate-200 text-slate-900 font-bold hover:bg-white hover:shadow-lg transition-all duration-300"
-//                             >
-//                                 <item.icon className="w-5 h-5 text-blue-600" />
-//                                 <span className='text-slate-500'>{item.label}</span>
-//                             </div>
-//                         ))}
-//                     </div>
-
-
-//                     <p className="text-xs font-bold text-slate-400 italic">
-//                         Last enrolled:
-//                     </p>
-
-//                 </div>
-
-//                 <div className="lg:col-span-1">
-//                     <div className="sticky top-24 bg-white/70 backdrop-blur-md p-8 rounded-[2rem] border border-white/20 shadow-2xl space-y-8">
-//                         <div className="space-y-2">
-//                             <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Course Price</p>
-//                             <div className="flex items-baseline gap-2">
-//                                 <span className="text-5xl font-black text-blue-600">Free</span>
-//                                 <span className="text-slate-400 line-through font-bold">$199</span>
-//                             </div>
-//                         </div>
-
-//                         <div className="space-y-4">
-//                             <p className="text-slate-700 font-medium">
-//                                 <strong>Instructor:</strong>  Industry Expert
-//                             </p>
-//                             <div className="w-full h-px bg-slate-100"></div>
-//                             <ul className="space-y-3">
-//                                 {['Lifetime Access', 'Expert Guidance', 'Verified Certificate'].map((item, i) => (
-//                                     <li
-//                                         key={i}
-//                                         className="flex items-center gap-3 text-sm font-bold text-slate-500"
-//                                     >
-//                                         <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-//                                         {item}
-//                                     </li>
-//                                 ))}
-//                             </ul>
-//                         </div>
-//                         <p className="text-center text-xs text-slate-500 font-bold">30-Day Money-Back Guarantee • Secure Payment</p>
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
-
-
-
-// const NotFound = () => {
-//     return (
-//         <div className="max-w-7xl mx-auto px-4 py-24 text-center">
-//             <h2 className="text-2xl font-bold text-red-500">Course not found</h2>
-//             <p className="text-muted-foreground mt-2">Please log in to view protected course details.</p>
-//         </div>
-//     );
-// }
-
-
-
-
-
-
-
-import EnrollmentButton from '@/components/EnrollmentButton';
-import { auth } from '@/lib/auth';
-import { Chip } from '@heroui/react';
-import { BookOpen, Clock, BarChart, Users } from 'lucide-react';
-import { headers } from 'next/headers';
-import Image from 'next/image';
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import Image from "next/image";
 
 const fetchSingleCourse = async (id, token) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tutors/${id}`, { 
-            cache: 'no-store',
-            headers: {
-                authorization: `Bearer ${token}` || '',
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/tutors/${id}`,
+            {
+                cache: "no-store",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             }
-         });
-        if (!res.ok) return {};
-        
-       
-        const data = await res.json();
-        return data || {};
+        );
+
+        if (!res.ok) {
+            console.error("Tutor API error:", res.status);
+            return null;
+        }
+
+        return await res.json();
     } catch (error) {
-        console.error("Fetch error:", error);
-        return {};
+        console.error("Fetch tutor error:", error);
+        return null;
     }
 };
 
 export default async function CourseDetails({ params }) {
     const { id } = await params;
+    const requestHeaders = await headers();
 
-      const {token} = await auth.api.getToken({
-        headers: await headers()
-      });
-      
+    // Check Login
+    const session = await auth.api.getSession({
+        headers: requestHeaders,
+    });
 
-    const tutors = await fetchSingleCourse(id, token);
-    
-    console.log(tutors);
-    
-    // if (!tutors || Object.keys(tutors).length === 0) {
-    //     return <NotFound />;
-    // }
+    if (!session?.user) {
+        redirect(
+            `/auth/signin?callbackUrl=${encodeURIComponent(
+                `/tutors/${id}`
+            )}`
+        );
+    }
 
-    const { _id,  enrolledStudents, title, description, thumbnail, category, price, duration, instructor } = tutors;
-   
-    
+    // Get JWT
+    const { token } = await auth.api.getToken({
+        headers: requestHeaders,
+    });
+
+    if (!token) {
+        redirect(
+            `/auth/signin?callbackUrl=${encodeURIComponent(
+                `/tutors/${id}`
+            )}`
+        );
+    }
+
+    // Fetch Tutor
+    const tutor = await fetchSingleCourse(id, token);
+
+    if (!tutor) {
+        return (
+            <div className="min-h-screen bg-[#0f1115] flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-3xl font-bold text-red-500">
+                        Tutor not found
+                    </h2>
+                    <p className="text-gray-400 mt-2">
+                        Please check the tutor ID or try again later.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    const {
+        tutorName,
+        photoURL,
+        subjectCategory,
+        availableDaysAndTime,
+        hourlyFee,
+        totalSlot,
+        institution,
+        experience,
+        location,
+        teachingMode,
+    } = tutor;
+
     const featuredItems = [
-        { icon: Clock, label: duration || '12h 30m' },
-        { icon: BarChart, label: category || 'Beginner' },
-        { icon: BookOpen, label: `24 Lessons` },
-        { icon: Users, label: `${ enrolledStudents || 0} Students` },
-        
-        ];
+        {
+            icon: GraduationCap,
+            label: subjectCategory || "General",
+        },
+        {
+            icon: Calendar,
+            label: availableDaysAndTime || "Flexible",
+        },
+        {
+            icon: MapPin,
+            label: location || "Remote",
+        },
+        {
+            icon: Users,
+            label: `${totalSlot || 0} Slots Available`,
+        },
+    ];
+
     return (
-        // ব্যাকগ্রাউন্ড লাক্সারি ডিপ ডার্ক থিম করা হয়েছে
         <div className="min-h-screen bg-[#0f1115] text-white py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
-                    
-                    {/* Left Column - Content */}
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+                    {/* LEFT COLUMN */}
                     <div className="lg:col-span-2 space-y-8">
-                        <div className="relative group overflow-hidden rounded-[2.5rem] border border-[#22252e] shadow-2xl aspect-video bg-[#1f222a]">
+
+                        {/* Image */}
+                        <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-[#22252e]">
                             <Image
-                                src={thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200'}
-                                alt={title || "Course Image"}
+                                src={
+                                    photoURL ||
+                                    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200"
+                                }
+                                alt={tutorName || "Tutor Profile"}
                                 fill
-                                className="object-cover transform transition duration-700 group-hover:scale-105"
+                                className="object-cover"
                             />
                             <div className="absolute top-6 left-6">
-                                {/* কাস্টম ফ্ল্যাট রোজ পিঙ্ক চিপ */}
                                 <Chip
                                     variant="flat"
-                                    className="font-bold bg-[#1f222a]/90 text-[#fbc7d4] border border-[#2a2d36] backdrop-blur-md px-4 py-1"
+                                    className="bg-[#1f222a]/90 text-[#fbc7d4] border border-[#22252e] font-bold"
                                 >
-                                    {category || "Premium"}
+                                    {teachingMode || "Offline"} Mode
                                 </Chip>
                             </div>
                         </div>
 
+                        {/* Title & Info */}
                         <div className="space-y-4">
-                            {/* টেক্সট কালার হোয়াইট করা হয়েছে এবং ডাটা ডাইনামিক */}
-                            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                                {title || "Mastering Next - From Beginner to Pro"}
+                            <span className="text-[#fbc7d4] font-semibold text-sm uppercase tracking-wider">
+                                {subjectCategory} Tutor
+                            </span>
+                            <h1 className="text-4xl md:text-5xl font-black">
+                                {tutorName}
                             </h1>
-                            <p className="text-xl text-gray-400 leading-relaxed">
-                                {description || "Master the core concepts of this subject with our comprehensive guide designed for all skill levels."}
+                            <div className="flex items-center gap-3 text-gray-400 text-lg">
+                                <Building className="w-5 h-5 text-[#fbc7d4]" />
+                                <span>{institution || "Institution not specified"}</span>
+                            </div>
+                        </div>
+
+                        {/* Features Bar */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#22252e]">
+                            {featuredItems.map((item, index) => {
+                                const Icon = item.icon;
+                                return (
+                                    <div
+                                        key={index}
+                                        className="flex flex-col items-center justify-center p-4 bg-[#16181d] rounded-2xl border border-[#22252e] text-center gap-2"
+                                    >
+                                        <Icon className="w-6 h-6 text-[#fbc7d4]" />
+                                        <span className="text-xs text-gray-300 font-medium truncate w-full">
+                                            {item.label}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Experience & Bio Section */}
+                        <div className="bg-[#16181d] p-6 md:p-8 rounded-3xl border border-[#22252e] space-y-4">
+                            <h3 className="text-xl font-bold flex items-center gap-2 text-[#fbc7d4]">
+                                <Briefcase className="w-5 h-5" />
+                                Experience & Qualifications
+                            </h3>
+                            <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                                {experience || "No experience details provided."}
                             </p>
                         </div>
 
-                        {/* ইনফো ব্যাজেস - ডার্ক থিম ও রোজ পিঙ্ক আইকন */}
-                        <div className="flex flex-wrap gap-4 pt-8 border-t border-[#22252e]">
-                            {featuredItems.map((item, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center gap-3 bg-[#16181d] px-6 py-3 rounded-2xl border border-[#22252e] text-gray-300 font-bold hover:border-gray-600 transition-all duration-300"
-                                >
-                                    <item.icon className="w-5 h-5 text-[#fbc7d4]" />
-                                    <span className='text-gray-300'>{item.label}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <p className="text-xs font-bold text-gray-500 italic">
-                            Last enrolled: Just now
-                        </p>
                     </div>
 
-                    {/* Right Column - Sticky Card */}
-                    <div className="lg:col-span-1">
-                        {/* সলিড লাক্সারি ডার্ক কার্ড bg-[#16181d] এবং border-[#22252e] */}
-                        <div className="sticky top-24 bg-[#16181d] p-8 rounded-[2rem] border border-[#22252e] shadow-2xl space-y-8">
-                            <div className="space-y-2">
-                                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Course Price</p>
-                                <div className="flex items-baseline gap-2">
-                                    {/* প্রাইস কালার রোজ পিঙ্ক (#fbc7d4) করা হয়েছে */}
+                    {/* RIGHT COLUMN */}
+                    <div>
+                        <div className="sticky top-24 bg-[#16181d] p-8 rounded-[2rem] border border-[#22252e] space-y-8">
+
+                            {/* Price */}
+                            <div>
+                                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">
+                                    Hourly Rate
+                                </p>
+                                <div className="mt-1 flex items-baseline gap-1">
                                     <span className="text-5xl font-black text-[#fbc7d4]">
-                                        {price && price > 0 ? `$${price}` : "Free"}
+                                        ৳{hourlyFee}
                                     </span>
-                                    {price && price > 0 && (
-                                        <span className="text-gray-500 line-through font-bold">${price + 99}</span>
-                                    )}
+                                    <span className="text-gray-400 text-sm">/ hour</span>
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
-                                <p className="text-gray-300 font-medium">
-                                    <strong>Instructor:</strong> <span className="text-[#fbc7d4]">{instructor || "Industry Expert"}</span>
-                                </p>
-                                <div className="w-full h-px bg-[#22252e]"></div>
-                                <ul className="space-y-3">
-                                    {['Lifetime Access', 'Expert Guidance', 'Verified Certificate'].map((item, i) => (
-                                        <li
-                                            key={i}
-                                            className="flex items-center gap-3 text-sm font-bold text-gray-400"
-                                        >
-                                            {/* বুলেট পয়েন্টের কালার রোজ পিঙ্ক */}
-                                            <div className="w-1.5 h-1.5 bg-[#fbc7d4] rounded-full"></div>
-                                            {item}
-                                        </li>
-                                    ))}
-                                </ul>
+                            {/* Details List */}
+                            <div className="space-y-4 border-t border-b border-[#22252e] py-6 text-sm">
+                                <div className="flex justify-between items-center text-gray-300">
+                                    <span className="text-gray-400">Total Slots:</span>
+                                    <span className="font-semibold text-white">{totalSlot || "N/A"}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-gray-300">
+                                    <span className="text-gray-400">Teaching Mode:</span>
+                                    <span className="font-semibold text-white">{teachingMode}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-gray-300">
+                                    <span className="text-gray-400">Location:</span>
+                                    <span className="font-semibold text-white">{location}</span>
+                                </div>
                             </div>
 
-                            <EnrollmentButton tutors={tutors}></EnrollmentButton>
-                            <p className="text-center text-xs text-gray-500 font-bold">30-Day Money-Back Guarantee • Secure Payment</p>
+                            {/* Enrollment Button Component */}
+                            <EnrollmentButton tutors={tutor} />
+
                         </div>
                     </div>
 
@@ -280,16 +242,3 @@ export default async function CourseDetails({ params }) {
         </div>
     );
 }
-
-const NotFound = () => {
-    return (
-        <div className="min-h-screen bg-[#0f1115] flex items-center justify-center text-center px-4">
-            <div className="bg-[#16181d] p-12 rounded-3xl border border-[#22252e] max-w-md w-full shadow-2xl">
-                <h2 className="text-2xl font-bold text-red-500">Course not found</h2>
-                <p className="text-gray-400 mt-2">Please check your API backend or parameters.</p>
-            </div>
-        </div>
-    );
-};
-
-

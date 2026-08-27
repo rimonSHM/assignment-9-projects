@@ -1,72 +1,55 @@
 
 
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@heroui/react";
-import { useSession, authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { useState, useEffect } from 'react';
+import { useSession } from '@/lib/auth-client';
+import EnrollmentModal from './EnrollmentModal';
 
-export default function EnrollmentButton({ tutors }) {
-    const { data: session } = useSession();
+export default function EnrollmentButton({ tutors, session: propsSession, token: propsToken }) {
+  const [isOpen, setIsModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false); // Hydration mismatch ঠেকানোর জন্য
 
-   const router = useRouter();
+  const { data: clientSession, isPending } = useSession();
 
-   
-    const handleEnroll = async () => {
-        try {
-            const { data: jwtData } = await authClient.token();
-            const token = jwtData?.token;
-            if (!token) {
-                toast.error("You must be logged in to enroll in a tutor.");
-                return;
-            }
-            
-            const updatedData = {
-                userId: session?.user?.id,
-                studentName: session?.user?.name,
-                courseTitle: tutors?.title,
-                thumbnail: tutors?.thumbnail,
-            };
+  // ক্লায়েন্ট সাইডে রেন্ডার সম্পন্ন হওয়া নিশ্চিত করা
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-            //  Fixed the template literal syntax here
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/enrollments/${tutors?._id}/`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(updatedData)
-            });
+  const session = propsSession || clientSession;
+  const token = propsToken || session?.session?.token || session?.accessToken || session?.token;
 
-            // Added basic error checking before parsing
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(`Server error (${res.status}): ${errorText}`);
-            }
+  const tutorData = tutors?.tutor || tutors;
+  const isSlotOut = !tutorData?.totalSlot || tutorData?.totalSlot <= 0;
 
-            const data = await res.json();
-            console.log(data);
-            toast.success("Successfully enrolled!");
-            
-        } catch (error) {
-            console.error("Enrollment failed:", error);
-            toast.error("Something went wrong with your enrollment.");
-            return;
-        }
-
-
-        router.push("/my-tutors");
-    };
-
-    return (
-        <Button
-            size="lg"
-            className="w-full mt-4 font-bold bg-gradient-to-r from-[#fbc7d4] to-[#cbb4d4] text-black"
-            onPress={handleEnroll}
+  return (
+    <>
+      {isSlotOut ? (
+        <button
+          disabled
+          className="w-full py-4 bg-gray-800 text-gray-500 rounded-2xl font-bold cursor-not-allowed border border-[#22252e]"
         >
-            Enroll Now
-        </Button>
-    );
+          No Slots Available
+        </button>
+      ) : (
+        <button
+          onClick={() => setIsModalOpen(true)}
+          disabled={mounted && isPending} // Client mount হওয়ার পরেই disabled চেক করা
+          className="w-full py-4 bg-[#fbc7d4] hover:bg-[#f8b4c4] text-black font-bold rounded-2xl transition duration-200 shadow-lg shadow-[#fbc7d4]/10 active:scale-[0.98] cursor-pointer disabled:opacity-50"
+        >
+          {mounted && isPending ? 'Loading...' : 'Enroll Now'}
+        </button>
+      )}
+
+      {/* Booking Modal Component */}
+      <EnrollmentModal
+        tutor={tutorData}
+        session={session}
+        token={token}
+        isOpen={isOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
+  );
 }

@@ -1,62 +1,100 @@
 
 
-
-
 "use client";
 
-import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Search, RotateCcw } from "lucide-react";
 
 const SearchBar = () => {
-  // Controlled input ওয়ার্নিং এড়াতে ডিফল্ট ভ্যালু "" দেওয়া হয়েছে
-  const [search, setSearch] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleSearch = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    
-    if (search.trim()) {
-      params.set("searchTerm", search.trim());
-    } else {
-      params.delete("searchTerm");
-    }
-    router.push(`/courses?${params.toString()}`);
-  };
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("searchTerm") || "");
+  const [startDate, setStartDate] = useState(searchParams.get("startDate") || "");
+  const [endDate, setEndDate] = useState(searchParams.get("endDate") || "");
 
-  // Enter কী প্রেস করলে যেন অটোমেটিক সার্চ হয়
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+  // ফিল্টার আপডেট হলে URL চেঞ্জ করার ফাংশন
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+
+      if (searchQuery) params.set("searchTerm", searchQuery);
+      if (startDate) params.set("startDate", startDate);
+      if (endDate) params.set("endDate", endDate);
+
+      router.push(`?${params.toString()}`);
+    }, 400); // 400ms Debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, startDate, endDate, router]);
+
+  // ফিল্টার রিসেট
+  const handleReset = () => {
+    setSearchQuery("");
+    setStartDate("");
+    setEndDate("");
+    router.push("/tutors"); // বা আপনার রুট ইউআরএল
   };
 
   return (
-    <div className="relative flex items-center bg-[#16181d] border border-[#22252e] rounded-2xl shadow-xl focus-within:border-[#3a6073]/80 focus-within:ring-4 focus-within:ring-[#3a6073]/10 transition-all duration-300 overflow-hidden">
-      
-      {/* Icon */}
-      <div className="pl-5 text-gray-500">
-        <Search className="w-5 h-5" />
+    <div className="bg-[#181a20] p-4 rounded-xl border border-[#262932] shadow-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
+        {/* Search Tutor */}
+        <div>
+          <label className="block text-xs text-left font-medium text-gray-400 mb-1 pl-1">
+            Search Tutor
+          </label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search tutor by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#111318] border border-[#2e323e] rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition"
+            />
+          </div>
+        </div>
+
+        {/* Start Date */}
+        <div>
+          <label className="block text-xs text-left font-medium text-gray-400 mb-1 pl-1">
+            Start Date
+          </label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full bg-[#111318] border border-[#2e323e] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
+          />
+        </div>
+
+        {/* End Date */}
+        <div>
+          <label className="block text-xs text-left font-medium text-gray-400 mb-1 pl-1">
+            End Date
+          </label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full bg-[#111318] border border-[#2e323e] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
+          />
+        </div>
+
+        {/* Reset Button */}
+        <div className="flex items-end h-full pt-5">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="w-full bg-[#22252e] hover:bg-[#2c303c] text-gray-200 border border-[#323644] font-medium py-2 px-4 rounded-lg text-sm flex items-center justify-center gap-2 transition active:scale-95"
+          >
+            <RotateCcw className="w-4 h-4 text-emerald-400" />
+            <span>Reset Filters</span>
+          </button>
+        </div>
       </div>
-
-      {/* Input Field */}
-      <input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={handleKeyDown} // Enter কী হ্যান্ডলার
-        type="text"
-        placeholder="Search for courses (e.g. Next.js, React...)"
-        className="flex-1 h-14 px-4 outline-none bg-transparent text-white placeholder:text-gray-500 text-sm sm:text-base"
-      />
-
-      {/* Search Button */}
-      <button
-        onClick={handleSearch}
-        className="h-10 px-6 mr-2 rounded-xl bg-gradient-to-r from-[#fbc7d4] to-[#cbb4d4] text-black font-bold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-md"
-      >
-        Search
-      </button>
     </div>
   );
 };

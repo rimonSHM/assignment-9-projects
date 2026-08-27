@@ -1,155 +1,92 @@
-// import { Button, Chip } from "@heroui/react";
-// import { BookOpen, Clock } from "lucide-react";
-// import Image from "next/image";
-// import Link from "next/link";
-
-// const CourseCard = ({ course }) => {
-//     const {_id, title, thumbnail, category, price, duration, instructor } = course;
-//     return (
-//         <div
-//             className="group flex flex-col bg-white rounded-4xl border border-slate-200 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-//         >
-//             <div className="relative overflow-hidden aspect-16/10">
-//                 <Image
-//                     alt="Course Image"
-//                     className="object-cover group-hover:scale-110 transition-transform duration-700"
-//                     src={thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600"}
-
-//                     fill
-//                 />
-//                 <div className="absolute top-4 right-4">
-//                     <Chip
-//                         color="primary"
-//                         variant="solid"
-//                         className="font-bold shadow-lg shadow-blue-600/20"
-//                     >
-//                         {category}
-//                     </Chip>
-//                 </div>
-//             </div>
-//             <div className="p-8 flex flex-col grow space-y-4">
-//                 <div className="space-y-2">
-//                     <Link href={`/courses/${_id}`}>
-//                         <h3 className="text-xl font-bold leading-tight line-clamp-2 hover:text-blue-600 transition-colors">
-//                             {title}
-//                         </h3>
-//                     </Link>
-//                     <p className="text-sm text-slate-500 font-medium flex items-center gap-1">
-//                         By <span className="text-slate-900">{instructor}</span>
-//                     </p>
-//                 </div>
-
-//                 <div className="flex items-center gap-4 text-xs text-slate-500 font-bold">
-//                     <span className="flex items-center gap-1">
-//                         <Clock className="w-3.5 h-3.5" /> {duration}
-//                     </span>
-//                     <span className="flex items-center gap-1">
-//                         <BookOpen className="w-3.5 h-3.5" /> 24 Lessons
-//                     </span>
-//                 </div>
-
-//                 <div className="pt-6 mt-auto border-t border-slate-100 flex justify-between items-center">
-//                     <span className="text-2xl font-black text-blue-600">${price}</span>
-
-//                     <Button
-//                         variant="flat"
-//                         color="primary"
-//                         className="font-bold rounded-xl px-6"
-//                     >
-//                         Learn More
-//                     </Button>
-
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default CourseCard;
 
 
-"use client";
 
-import { Button, Chip } from "@heroui/react";
-import { BookOpen, Clock } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 
-const CourseCard = ({ course }) => {
-    // সেফগার্ড: ডেটা অবজেক্ট আনডিফাইনড থাকলেও অ্যাপ ক্র্যাশ করবে না
-    if (!course) return null;
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { MapPin, Building, GraduationCap, DollarSign, Calendar } from 'lucide-react';
+import { Chip, Button } from '@heroui/react';
 
-    const { _id, title, thumbnail, category, price, duration, instructor } = course;
+const TutorCard = ({ course }) => {
+  const {
+    _id,
+    tutorName,
+    photoURL,
+    subjectCategory,
+    hourlyFee,
+    institution,
+    location,
+    teachingMode,
+    availableDaysAndTime,
+  } = course;
 
-    return (
-        <div
-            className="group flex flex-col bg-[#16181d] rounded-3xl border border-[#22252e] hover:border-gray-700 overflow-hidden transition-all duration-300 hover:-translate-y-1"
-        >
-            {/* Image Container */}
-            <div className="relative overflow-hidden aspect-[16/10] bg-[#1f222a]">
-                <Image
-                    alt={title || "Course Image"}
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    src={thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600"}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                
-                {/* HeroUI Custom Flat Chip */}
-                {category && (
-                    <div className="absolute top-4 right-4 z-10">
-                        <Chip
-                            variant="flat"
-                            className="font-bold bg-[#1f222a]/90 text-[#fbc7d4] border border-[#2a2d36] backdrop-blur-md px-3 py-1 text-xs"
-                        >
-                            {category}
-                        </Chip>
-                    </div>
-                )}
-            </div>
-
-            {/* Content Area */}
-            <div className="p-6 flex flex-col grow space-y-4">
-                <div className="space-y-2">
-                    <Link href={`/tutors/${_id || ""}`}>
-                        <h3 className="text-lg font-bold leading-tight line-clamp-2 text-white hover:text-[#fbc7d4] transition-colors duration-200">
-                            {title || "Untitled Course"}
-                        </h3>
-                    </Link>
-                    <p className="text-xs text-gray-400 font-medium flex items-center gap-1">
-                        By <span className="text-gray-200">{instructor || "Unknown Instructor"}</span>
-                    </p>
-                </div>
-
-                {/* Info Badges */}
-                <div className="flex items-center gap-4 text-xs text-gray-400 font-bold">
-                    <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[#3a6073]" /> {duration || "Self-paced"}
-                    </span>
-                    <span className="flex items-center gap-1">
-                        <BookOpen className="w-3.5 h-3.5 text-[#cbb4d4]" /> 24 Lessons
-                    </span>
-                </div>
-
-                {/* Bottom Price & Action Button */}
-                <div className="pt-5 mt-auto border-t border-[#22252e] flex justify-between items-center">
-                    <span className="text-xl font-black text-white">${price || 0}</span>
-
-                                   <Link href={`/tutors/${_id || ""}`}>
-  <Button
-    variant="flat"
-    className="font-bold rounded-xl px-5 bg-[#1f222a] border border-[#2a2d36] text-gray-300 hover:text-white hover:border-gray-600 transition-all duration-200"
-  >
-    Learn More
-  </Button>
-</Link>
-                </div>
-            </div>
+  return (
+    <div className="bg-[#16181d] border border-[#22252e] rounded-2xl p-5 flex flex-col justify-between hover:border-gray-600 transition-all duration-300 shadow-lg">
+      <div>
+        {/* Header Image & Badge */}
+        <div className="relative h-48 w-full rounded-xl overflow-hidden mb-4 bg-gray-800">
+          <Image
+            src={photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600"}
+            alt={tutorName || "Tutor"}
+            fill
+            className="object-cover"
+          />
+          <div className="absolute top-3 right-3">
+            <Chip variant="solid" className="bg-[#1f222a]/90 text-[#fbc7d4] font-semibold text-xs border border-[#22252e]">
+              {teachingMode || "Offline"}
+            </Chip>
+          </div>
         </div>
-    );
+
+        {/* Category & Name */}
+        <div className="mb-3">
+          <span className="text-xs font-semibold text-[#fbc7d4] uppercase tracking-wider">
+            {subjectCategory}
+          </span>
+          <h3 className="text-xl font-bold text-white mt-1 capitalize">
+            {tutorName}
+          </h3>
+        </div>
+
+        {/* Info Items */}
+        <div className="space-y-2 text-sm text-gray-400 mb-6">
+          <div className="flex items-center gap-2">
+            <Building className="w-4 h-4 text-gray-500 shrink-0" />
+            <span className="truncate">{institution || "N/A"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
+            <span className="truncate">{location || "N/A"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-gray-500 shrink-0" />
+            <span className="truncate">{availableDaysAndTime || "Flexible"}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer / Price & Action */}
+      <div className="pt-4 border-t border-[#22252e] flex items-center justify-between">
+        <div>
+          <span className="text-xs text-gray-500 block">Hourly Fee</span>
+          <span className="text-xl font-black text-white flex items-center">
+            ৳{hourlyFee}
+            <span className="text-xs text-gray-400 font-normal">/hr</span>
+          </span>
+        </div>
+
+        <Link href={`/tutors/${_id}`}>
+          <Button
+            size="sm"
+            className="bg-[#fbc7d4] text-black font-bold hover:bg-[#f8a8bc] transition-colors rounded-xl"
+          >
+            View Details
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
 };
 
-export default CourseCard;
-
-
-
+export default TutorCard;
