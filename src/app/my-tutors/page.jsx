@@ -12,9 +12,9 @@ import {
   X,
 } from "lucide-react";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8080";
+// const API_URL =
+//   process.env.NEXT_PUBLIC_API_URL || 
+//   "http://localhost:8080";
 
 const MyTutors = () => {
   const [tutors, setTutors] = useState([]);
@@ -35,10 +35,10 @@ const MyTutors = () => {
       setLoading(true);
 
       const response = await fetch(
-        `${API_URL}/my-tutors`,
+        `${process.env.NEXT_PUBLIC_API_URL}/my-tutors`,
         {
           method: "GET",
-          credentials: "include",
+          // credentials: "include",
           cache: "no-store",
         }
       );
@@ -177,16 +177,16 @@ const MyTutors = () => {
       };
 
       const response = await fetch(
-        `${API_URL}/tutors/${selectedTutor._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/tutors/${selectedTutor._id}`,
         {
           method: "PUT",
 
-          headers: {
+          headers: { 
             "Content-Type": "application/json",
           },
 
           // ⭐ Better Auth cookie পাঠাবে
-          credentials: "include",
+          // credentials: "include",
 
           body: JSON.stringify(
             updatedTutorPayload

@@ -10,6 +10,10 @@ import { authClient } from "@/lib/auth-client";
 
 const AddTutor = () => {
   const [loading, setLoading] = useState(false);
+    
+     
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,20 +36,23 @@ const AddTutor = () => {
       };
 
       // 🔴 Better Auth থেকে Active Session নেওয়া
-      const session = await authClient.getSession();
+       const session = await authClient.getSession();
       const token = session?.data?.session?.token || session?.data?.user?.id;
-
-      const response = await fetch("http://localhost:8080/tutors", {
+        console.log(token)
+    
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tutors`, {
         method: "POST",
-        credentials: "include", // Cookie ভিত্তিক অথেন্টিকেশনের জন্য
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token || ""}`, // Bearer Token verification-এর জন্য
+          Authorization: `Bearer ${token || ""}`,
+           // Bearer Token verification-এর জন্য
         },
         body: JSON.stringify(newTutor),
       });
-
+       
       const data = await response.json();
+      
 
       if (response.ok) {
         toast.success("Tutor added successfully!");
@@ -259,3 +266,4 @@ const AddTutor = () => {
 };
 
 export default AddTutor;
+
