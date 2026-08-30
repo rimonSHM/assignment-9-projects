@@ -64,7 +64,7 @@ export const auth = betterAuth({
 
   // Domain & CORS Handling
   baseURL:
-    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
     "https://assigment-9-perject-lt4wfe4lb-rimon-hasan.vercel.app" || "https://assigment-9-perject.vercel.app",
 
   trustedOrigins: [

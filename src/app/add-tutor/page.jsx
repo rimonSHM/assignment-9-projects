@@ -19,6 +19,9 @@ const AddTutor = () => {
     e.preventDefault();
     const form = e.target;
     setLoading(true);
+    const session = await authClient.getSession();
+       console.log(session)
+      const token = session?.data?.session?.token;
 
     try {
       const newTutor = {
@@ -33,11 +36,11 @@ const AddTutor = () => {
         experience: form.experience.value.trim(),
         location: form.location.value.trim(),
         teachingMode: form.teachingMode.value,
+        userId: session.data.user.id
       };
 
       // 🔴 Better Auth থেকে Active Session নেওয়া
-       const session = await authClient.getSession();
-      const token = session?.data?.session?.token || session?.data?.user?.id;
+       
         console.log(token)
     
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tutors`, {
@@ -67,6 +70,8 @@ const AddTutor = () => {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-black text-white">
