@@ -1,8 +1,3 @@
-
-
-
-
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -21,13 +16,16 @@ const MyTutors = () => {
 
   // API Base URL
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-  const { data: session, isPending, error } = authClient.useSession()
-  console.log(session)
-  const token =session.session.token;
+  const { data: session, isPending } = authClient.useSession();
+  
+  const token = session?.session?.token;
+
   // =====================================================
   // GET MY TUTORS
   // =====================================================
   const fetchMyTutors = async () => {
+    if (!token) return; // টোকেন না থাকলে রিকোয়েস্ট যাবে না
+
     try {
       setLoading(true);
 
@@ -35,10 +33,9 @@ const MyTutors = () => {
         method: "GET",
         credentials: "include",
         cache: "no-store",
-                headers: {
+        headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token || ""}`,
-           // Bearer Token verification-এর জন্য
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -57,9 +54,14 @@ const MyTutors = () => {
     }
   };
 
+  // Session এর token পাওয়ার পর ডাটা ফেচ হবে
   useEffect(() => {
-    fetchMyTutors();
-  }, []);
+    if (!isPending && token) {
+      fetchMyTutors();
+    } else if (!isPending && !token) {
+      setLoading(false); // Session লোড হওয়া শেষ কিন্তু টোকেন নেই
+    }
+  }, [token, isPending]);
 
   // =====================================================
   // EDIT
@@ -131,6 +133,7 @@ const MyTutors = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token || ""}`, // Added Authorization
           },
           credentials: "include",
           body: JSON.stringify(updatedTutorPayload),
@@ -144,7 +147,6 @@ const MyTutors = () => {
         return;
       }
 
-      // Local state update
       setTutors((prev) =>
         prev.map((tutor) =>
           String(tutor._id) === String(selectedTutor._id)
@@ -185,6 +187,7 @@ const MyTutors = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token || ""}`, // Added Authorization
         },
         credentials: "include",
       });
@@ -196,7 +199,6 @@ const MyTutors = () => {
         return;
       }
 
-      // Remove from UI
       setTutors((prev) =>
         prev.filter((tutor) => String(tutor._id) !== String(id))
       );
@@ -233,7 +235,7 @@ const MyTutors = () => {
 
           {/* Table */}
           <div className="bg-[#111111] rounded-2xl shadow-lg border border-gray-800 overflow-hidden">
-            {loading ? (
+            {isPending || loading ? (
               <div className="p-16 flex flex-col items-center justify-center gap-3 text-gray-400">
                 <Loader2 className="w-6 h-6 animate-spin" />
                 <span>Loading tutors...</span>
@@ -563,4 +565,4 @@ const MyTutors = () => {
   );
 };
 
-export default MyTutors;
+export default MyTutors;  
